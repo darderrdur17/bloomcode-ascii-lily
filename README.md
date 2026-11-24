@@ -14,7 +14,7 @@ Vibecoding by Software Company — Summon Team | Qi (Director) | Gao (Architect)
 
 ## Features
 
-- Five procedural six-petal lilies in red, purple, yellow and white, with stems, leaves and a ribbon-tied bouquet wrap
+- Five hand-drawn lily sprites in red, purple, yellow and white, with shaded petals, visible stamens, curved stems, lanceolate leaves and a ribbon-tied bouquet wrap
 - Sequential bloom: stem → leaves → bud → petals, eased with `easeOutCubic`
 - Audio unlock flow that respects browser autoplay policy, plus RMS-driven brightness/scale pulsing
 - Resilient audio chain: local MP3 → CDN MP3 → generated `Tone.PolySynth` ambient melody → silent animation
@@ -105,7 +105,7 @@ export const PALETTE = Object.freeze({
 });
 ```
 
-Monochrome green is `CONFIG.MONOCHROME_COLOR` (`#00ff41`). Flower positions, colours and bloom delays are in the `FLOWERS` array in the same file. Petal glyphs and angles are in `GLYPHS` and `PETALS`.
+Monochrome green is `CONFIG.MONOCHROME_COLOR` (`#00ff41`). Flower positions, colours and bloom delays are in the `FLOWERS` array in the same file. The lily silhouette itself is the `LILY_SPRITE` array — edit its characters to reshape the petals, and `LEAF_SPRITE` to reshape the leaves. Rows are revealed from the centre outward, so the stamens open before the petal tips.
 
 ---
 

@@ -102,14 +102,28 @@ export const GLYPHS = Object.freeze({
 });
 
 /**
- * Six petals of a lily. `angle` is in degrees in screen space (y grows down).
- * `spine` is the glyph drawn along the petal axis; `left`/`right` form the fold.
+ * Hand-drawn lily sprite. Rows are revealed from the centre outward as the
+ * flower blooms, which reads as a real petal-by-petal opening rather than a
+ * set of radiating strokes.
+ *
+ * Glyph roles: `# @ % * . '` = petal, `o O :` = stamens/pistil, `space` = empty.
+ * Every row is padded to a fixed width at render time, so extra spaces here
+ * are harmless.
  */
-export const PETALS = Object.freeze([
-  Object.freeze({ angle: -90, spine: '|', left: '\\', right: '/' }),
-  Object.freeze({ angle: -30, spine: '/', left: '|', right: '\\' }),
-  Object.freeze({ angle: 30,  spine: '\\', left: '-', right: '|' }),
-  Object.freeze({ angle: 90,  spine: '|', left: '/', right: '\\' }),
-  Object.freeze({ angle: 150, spine: '/', left: '-', right: '|' }),
-  Object.freeze({ angle: 210, spine: '\\', left: '|', right: '-' }),
+export const LILY_SPRITE = Object.freeze([
+  '        *        ',
+  '      .*#*.      ',
+  '    .*##@##*.    ',
+  '  .*##@%@##*.    ',
+  '--##%oOOo%##--   ',
+  '  *##% o o %##*  ',
+  "   '*##@##*'     ",
+  "     '*#*'       ",
+  '       .         ',
+]);
+
+/** Leaf sprite: a compact lanceolate blade with a highlighted midrib. */
+export const LEAF_SPRITE = Object.freeze([
+  ' \\##/ ',
+  '  \\/  ',
 ]);

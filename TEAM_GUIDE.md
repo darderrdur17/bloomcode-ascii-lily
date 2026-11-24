@@ -12,7 +12,7 @@ Vibecoding by Software Company. This guide maps the Summon Team roles to the par
 
 | Role | Owner | Owns |
 | --- | --- | --- |
-| Director | **Qi** | Creative direction, bouquet composition, tone of the title/subtitle copy, final visual sign-off |
+| Director | **Qi** | Creative direction, bouquet composition, flower silhouette, final visual sign-off |
 | Architect | **Gao** | Module boundaries (`renderer` / `generator` / `audio` / `main`), framebuffer contract, performance budget, Vercel + iframe configuration |
 | Engineer | **Kou** | Implementation of the renderer, flower geometry, audio failover chain, UI controls and keyboard shortcuts |
 | PM | **Xu** | Scope, deliverable checklist, README and share-link behaviour, scheduling of review checkpoints |

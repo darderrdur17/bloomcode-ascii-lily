@@ -3,7 +3,7 @@
  * @module flower-generator
  */
 
-import { CONFIG, FLOWERS, GLYPHS, PALETTE, PETALS } from './config.js';
+import { CONFIG, FLOWERS, GLYPHS, LEAF_SPRITE, LILY_SPRITE, PALETTE } from './config.js';
 
 /** @typedef {import('./ascii-renderer.js').ASCIIRenderer} ASCIIRenderer */
 
@@ -71,16 +71,17 @@ export class FlowerGenerator {
    * @returns {void}
    */
   generateLeaf(x, y, dir, color) {
-    // A compact 2x2 "\\\\//" / "//\\\\" blob reads clearly as a leaf and
-    // avoids the long diagonal streaks that long leaves create on an 80x40 grid.
-    const x0 = x + (dir > 0 ? 1 : -2);
-    const upper = dir > 0 ? GLYPHS.petalFold : GLYPHS.petalEdge;
-    const lower = dir > 0 ? GLYPHS.petalEdge : GLYPHS.petalFold;
-    this.renderer.drawChar(x0, y - 1, upper, color);
-    this.renderer.drawChar(x0 + 1, y - 1, upper, color);
-    this.renderer.drawChar(x0, y, lower, color);
-    this.renderer.drawChar(x0 + 1, y, lower, color);
-    this.renderer.drawChar(x0 + (dir > 0 ? 2 : -1), y, GLYPHS.bud, color);
+    // Mirrored lanceolate blade with a bright midrib, drawn from a small sprite.
+    const width = Math.max(...LEAF_SPRITE.map((row) => row.length));
+    for (let row = 0; row < LEAF_SPRITE.length; row++) {
+      const source = LEAF_SPRITE[row];
+      for (let col = 0; col < width; col++) {
+        const ch = source[col] || ' ';
+        if (ch === ' ') continue;
+        const xPos = dir > 0 ? x + 1 + col : x - width + col;
+        this.renderer.drawChar(xPos, y - 1 + row, ch, color);
+      }
+    }
   }
 
   /**
@@ -100,11 +101,12 @@ export class FlowerGenerator {
   }
 
   /**
-   * Draw a fully parametric lily: six staggered petals plus pistil.
+   * Draw a lily from a hand-tuned sprite. Rows are revealed from the centre
+   * outward, so the stamens appear first and the petal tips last.
    * @param {number} centerX
    * @param {number} centerY
    * @param {string} color CSS colour for the petals
-   * @param {number} bloomProgress 0..1 controls how many petals are visible
+   * @param {number} bloomProgress 0..1 controls how many petal rings are visible
    * @param {number} [scale=1]
    * @returns {void}
    */
@@ -114,66 +116,31 @@ export class FlowerGenerator {
 
     const cx = Math.round(centerX);
     const cy = Math.round(centerY);
+    const middle = Math.floor(LILY_SPRITE.length / 2);
+    const width = Math.max(...LILY_SPRITE.map((row) => row.length));
+    const left = cx - Math.floor(width / 2);
+    const top = cy - middle;
 
-    const maxLen = Math.max(2, Math.round(4 * scale));
+    // 1 ring = stamens only; 5 rings = fully open flower.
+    const rings = Math.max(1, Math.min(middle + 1, Math.round((1 + bloom * middle) * scale)));
 
-    for (let i = 0; i < PETALS.length; i++) {
-      const petal = PETALS[i];
-      // Each petal opens slightly after the previous one.
-      const local = clamp((bloom - i * 0.035) / 0.85);
-      if (local <= 0) continue;
-
-      const len = Math.max(1, Math.round(local * maxLen));
-      const angle = (petal.angle * Math.PI) / 180;
-      const ux = Math.cos(angle);
-      const uy = Math.sin(angle);
-      // Perpendicular vector, used to give each petal width.
-      const nx = -uy;
-      const ny = ux;
-
-      for (let r = 2; r <= len; r++) {
-        // Horizontal stretch compensates for terminal cells being ~2x tall.
-        const px = Math.round(cx + ux * r * 1.3);
-        const py = Math.round(cy + uy * r * 0.78);
-
-        let glyph = petal.spine;
-        if (r === len) glyph = GLYPHS.petalTip;
-        this.renderer.drawChar(px, py, glyph, color);
-
-        // Folded edges make the six petals read as broad lily petals.
-        if (r >= 3 && r < len) {
-          this.renderer.drawChar(
-            Math.round(cx + ux * r * 1.3 + nx),
-            Math.round(cy + uy * r * 0.78 + ny),
-            petal.left,
-            color
-          );
-          this.renderer.drawChar(
-            Math.round(cx + ux * r * 1.3 - nx),
-            Math.round(cy + uy * r * 0.78 - ny),
-            petal.right,
-            color
-          );
-        }
+    for (let row = 0; row < LILY_SPRITE.length; row++) {
+      if (Math.abs(row - middle) >= rings) continue;
+      const glyphs = LILY_SPRITE[row];
+      for (let col = 0; col < width; col++) {
+        const ch = glyphs[col] || ' ';
+        if (ch === ' ') continue;
+        const isStamen = ch === 'o' || ch === 'O' || ch === ':';
+        this.renderer.drawChar(left + col, top + row, ch, isStamen ? PALETTE.accent : color);
       }
-    }
-
-    // Draw the pistil last so petal strokes never overwrite it.
-    if (bloom > 0.12) {
-      this.renderer.drawText(cx - 2, cy, GLYPHS.pistil, PALETTE.accent);
-    }
-    if (bloom > 0.32) {
-      this.renderer.drawText(cx - 1, cy + 1, GLYPHS.stigma, PALETTE.accent);
     }
 
     // Final sparkle ring once the flower is wide open.
     if (bloomProgress > 0.86) {
       const twinkle = Math.round(centerX + centerY) % 2 === 0;
-      this.renderer.drawChar(cx - 6, cy - 2, GLYPHS.sparkle, PALETTE.accent);
-      this.renderer.drawChar(cx + 6, cy - 2, GLYPHS.sparkle, PALETTE.accent);
-      if (twinkle) {
-        this.renderer.drawChar(cx, cy - 5, GLYPHS.sparkle, color);
-      }
+      this.renderer.drawChar(cx - 8, cy - 2, GLYPHS.sparkle, PALETTE.accent);
+      this.renderer.drawChar(cx + 8, cy - 2, GLYPHS.sparkle, PALETTE.accent);
+      if (twinkle) this.renderer.drawChar(cx, cy - 6, GLYPHS.sparkle, color);
     }
   }
 
@@ -238,7 +205,7 @@ export class FlowerGenerator {
         // 2. Leaves unfold once the stem is partly grown.
         if (local > 0.18) {
           const leafReveal = clamp((local - 0.18) / 0.28);
-          const leafCount = Math.max(1, Math.round(3 * leafReveal));
+          const leafCount = Math.max(1, Math.round(2 * leafReveal));
           for (let k = 0; k < leafCount; k++) {
             const t = 0.28 + k * 0.24;
             const lx = Math.round(baseX + lean * t);
