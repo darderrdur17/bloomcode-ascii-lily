@@ -1,8 +1,8 @@
 # Summon BloomCode — ASCII Lily Studio
 
-An interactive ASCII lily bouquet that blooms in sync with music. The flower style is adapted from the reference bouquet in [`arimecoa/GIVEAWAY-ASCII`](https://github.com/arimecoa/GIVEAWAY-ASCII): volumetric six-petal lilies shaded with an ASCII density ramp, layered green foliage and drifting golden specks, rebuilt for an 80×40 `<pre>` grid. An audio analyser drives a gentle brightness and scale pulse.
+An interactive ASCII lily bouquet that blooms in sync with music. The bouquet renderer is ported directly from [`arimecoa/GIVEAWAY-ASCII`](https://github.com/arimecoa/GIVEAWAY-ASCII): eleven volumetric six-petal lilies, five buds, 3D-shaded ASCII density glyphs, curved leaves, drifting golden specks and a soft bloom glow. Our app wraps that renderer with audio, controls and Vercel deployment.
 
-Built with **vanilla JavaScript ES6+**, HTML `<pre>` rendering and CSS3. No framework, no build step, no dependencies to install.
+Built with **vanilla JavaScript ES6+**, HTML5 `<canvas>` rendering and CSS3. No framework, no build step, no dependencies to install.
 
 > **Who needs flowers when you can code them? - ASCII Lily Bouquet**
 >
@@ -16,11 +16,11 @@ Designed for Qi (Delivery Director), Gao (Software Architect), Kou (Software Eng
 
 ## Features
 
-- Eight large **shaded lilies** plus five buds, each with six volumetric petals in pink, red, orange, yellow, coral or white
-- Density-ramp shading (`. : - = + * o O @`) gives the petals light, creases and curled tips like the reference
-- Layered green foliage: solid converging stems and narrow leaves with dark/mid/light shading
-- Drifting golden specks in the negative space and a CSS text glow
-- Staggered bloom: stems grow first, then each flower opens from a tight bud to a full six-petal lily
+- Eleven large **shaded lilies** plus five buds, each with six volumetric petals in pink, red, orange, yellow, coral or white
+- 3D-shaded ASCII density glyphs give the petals light, creases, curled tips and spot markings
+- Layered green foliage: curved stems and twisting, drooping leaves with front/back shading
+- Drifting golden specks in the negative space and a multi-pass additive glow
+- Staggered bloom with wind sway and a slow breathing motion after opening
 - Audio unlock overlay, 120 BPM Tone.js Transport, RMS analyser pulse
 - Resilient audio chain: local MP3 → CDN MP3 → generated `Tone.PolySynth` ambient melody → silent animation
 - Controls: Pause/Play, Restart, Sound, Color, Dark, `.txt` Export, Share, Speed (0.5×–2×), Volume (0–100%)
@@ -96,27 +96,9 @@ Load order, defined in `src/config.js`:
 
 ## Customise colours and geometry
 
-All geometry constants live in `src/config.js`.
+The bouquet's own constants are at the top of `src/bouquet-canvas.js` — `FLOWERS_BASE`, `BUDS_BASE`, `PALETTES`, `BUCKETS`, `LEVELS`, `settings` (`wind`, `size`, `glow`) and `LIGHT`. Editing those changes the reference rendering directly.
 
-```js
-export const PALETTE = Object.freeze({
-  red: '#FF2D55',
-  purple: '#A855F7',
-  yellow: '#FACC15',
-  white: '#FFFFFF',
-  green: '#22C55E',
-  stem: '#22C55E',
-  leaf: '#22C55E',
-  accent: '#FACC15',
-});
-```
-
-- `SHADED_FLOWERS` — positions, sizes, palette, bloom delays and tilt for the eight open lilies
-- `SHADED_BUDS` — the five unopened buds
-- `SHADED_PALETTES` — deep/mid/tip colours and anther colour per variety
-- `DENSITY_RAMP` — the `. : - = + * o O @` characters used for petal shading
-- `FOLIAGE` — dark/mid/light/under green shades for stems and leaves
-- `CONFIG.MONOCHROME_COLOR` — `#00ff41` for the green terminal mode
+Monochrome mode is a CSS filter applied by `src/main.js`, using `CONFIG.MONOCHROME_COLOR` (`#00ff41`) in `src/config.js`.
 
 ---
 
@@ -136,14 +118,15 @@ BloomCode/
 │       └── README.md
 └── src/
     ├── main.js
+    ├── bouquet-canvas.js
     ├── ascii-renderer.js
     ├── flower-generator.js
     ├── audio-sync.js
     └── config.js
 ```
 
-- `ascii-renderer.js` — 2D `{char, color}` framebuffer, batched into spans for one DOM write per frame
-- `flower-generator.js` — `generateStem` (solid), `generatePointedLily` (six petal vectors), `generateLeaf` (thin curve)
+- `bouquet-canvas.js` — the reference renderer: luminance field, 3D petal/leaf brushes, glyph masks, glow compositing and text export
+- `ascii-renderer.js` / `flower-generator.js` — the earlier `<pre>` framebuffer implementation, kept in the project structure
 - `audio-sync.js` — Tone.js load/unlock, source failover, analyser and transport
 - `main.js` — state, UI, URL params, keyboard, export/share, resize and the `requestAnimationFrame` loop
 
@@ -153,8 +136,8 @@ BloomCode/
 
 - `role="img"` and `aria-label="Animated ASCII lily bouquet"` on the artwork
 - Visible focus rings on all controls
-- 3,200 cells maximum; framebuffer cells are reused instead of reallocated
-- Pulse is a CSS `transform`/`filter`, so audio reactivity costs no re-render
+- The renderer uses typed arrays and pre-rendered glyph masks; cells are reused rather than reallocated
+- Render runs at 30fps to match the reference, while UI pulse uses CSS `transform`/`filter`
 - `prefers-reduced-motion` disables the transform pulse
 
 ---
