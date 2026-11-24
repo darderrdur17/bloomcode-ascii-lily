@@ -2,13 +2,7 @@
   "name": "summon-bloomcode-ascii-lily",
   "version": "1.0.0",
   "private": true,
-  "description": "Summon BloomCode - ASCII Lily Studio: a music-synced ASCII lily bouquet, built with vanilla JS + Tone.js and deployed as a static site.",
   "scripts": {
     "start": "npx serve ."
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "keywords": ["ascii-art", "canvas", "tonejs", "generative-art", "vercel", "static-site"],
-  "license": "MIT"
+  }
 }

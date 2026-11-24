@@ -1,28 +1,32 @@
 # Summon BloomCode — ASCII Lily Studio
 
-An interactive, music-synced ASCII lily bouquet. Five lilies bloom one after another from a terminal-style frame, characters pulse with the analyser's RMS level, and every glyph is drawn into an 80×40 framebuffer at 60fps.
+An interactive ASCII lily bouquet that blooms in sync with music. Five pointed, six-petal lilies open from solid stems inside an 80×40 terminal grid, while an audio analyser drives a gentle brightness and scale pulse.
 
-Built with **vanilla JavaScript ES6+**, HTML5 `<pre>` text rendering, CSS3, and **Tone.js 14.8.x**. No build step, no framework, no dependencies to install.
+Built with **vanilla JavaScript ES6+**, HTML `<pre>` rendering and CSS3. No framework, no build step, no dependencies to install.
 
-> **Version note:** the requested `14.8.59` was never published to npm — the last published 14.8.x is `14.8.49`, which is what the CDN URLs use. The UMD build is loaded as the primary source because Tone's ESM files use extensionless imports that require a bundler; the import map remains as a fallback.
+> **Who needs flowers when you can code them? - ASCII Lily Bouquet**
+>
+> Vibecoding by Software Company - Summon Team
 
-> *Who needs flowers when you can code them?*
+Designed for Qi (Delivery Director), Gao (Software Architect), Kou (Software Engineer), Xu (Product Manager) and Yan (QA Engineer).
 
-Vibecoding by Software Company — Summon Team | Qi (Director) | Gao (Architect) | Kou (Engineer) | Xu (PM) | Yan (QA)
+> **Tone.js note:** the requested `14.8.59` patch was never published to npm. The import map declares that exact URL for compatibility, while a working UMD build of `14.8.49` (the last published 14.8.x) is loaded as the primary source. Tone's ESM files use extensionless imports that require a bundler.
 
 ---
 
 ## Features
 
-- Five hand-drawn lily sprites in red, purple, yellow and white, with shaded petals, visible stamens, curved stems, lanceolate leaves and a ribbon-tied bouquet wrap
-- Sequential bloom: stem → leaves → bud → petals, eased with `easeOutCubic`
-- Audio unlock flow that respects browser autoplay policy, plus RMS-driven brightness/scale pulsing
+- Five **pointed star lilies**, each with six `/ \ |` petal lines and a yellow `(o)` pistil — no round blobs
+- Fixed bouquet layout: centre-top red, middle-left purple, middle-right yellow, bottom-left white, bottom-right red
+- **Solid stems** (`| / \`, one continuous glyph per row) converging cleanly at the base — no dashes, no ribbon artefact
+- **Thin leaves** (`(\/)` / `(/\)`), at most 4 cells wide and 2 tall, attached at a single point
+- Bloom stages: 0% stems → 20% bud `( )` → 40% two petals → 60% four petals → 100% six petals + `(o)`
+- Audio unlock overlay, 120 BPM Tone.js Transport, RMS analyser pulse
 - Resilient audio chain: local MP3 → CDN MP3 → generated `Tone.PolySynth` ambient melody → silent animation
-- Tone.js Transport at 120 BPM driving beat-synced visual events
-- Controls: play/pause, restart, speed (0.5×–2×), volume, mute, colour/monochrome, dark/light terminal, `.txt` export, share link
+- Controls: Pause/Play, Restart, Sound, Color, Dark, `.txt` Export, Share, Speed (0.5×–2×), Volume (0–100%)
 - URL parameters: `?speed=1&color=color&bg=dark`
-- Keyboard shortcuts: **Space** play/pause, **R** restart, **M** mute
-- `ResizeObserver` keeps the 80×40 grid legible in any iframe, down to 800×600 and below
+- Keyboard: **Space** play/pause, **R** restart, **M** mute
+- `ResizeObserver` scaling for 800×600 iframes and small screens
 - Preferences persisted in `localStorage` with safe fallbacks in sandboxed iframes
 
 ---
@@ -36,9 +40,9 @@ cd BloomCode
 npx serve .
 ```
 
-Then open the URL printed by `serve` (usually `http://localhost:3000`).
+Open the URL printed by `serve` (usually `http://localhost:3000`).
 
-> ES modules and the import map need HTTP — opening `index.html` via `file://` will not work. There is no install or build step.
+> ES modules and the import map need HTTP — opening `index.html` via `file://` will not work.
 
 ---
 
@@ -48,7 +52,9 @@ Then open the URL printed by `serve` (usually `http://localhost:3000`).
 2. In Vercel, **Add New → Project → Import** that repository.
 3. Set **Framework Preset: Other**, leave **Build Command** empty, set **Output Directory** to `.`, then click **Deploy**.
 
-`vercel.json` supplies clean URLs, the SPA rewrite, immutable caching for audio, and permissive frame headers. The audio file is served from `/public/audio/angel-radio-edit.mp3`.
+`vercel.json` supplies clean URLs, the SPA rewrite, immutable caching for `/public/audio/`, and `X-Frame-Options: ALLOWALL`. The audio file is served from `/public/audio/angel-radio-edit.mp3`.
+
+Be aware that Vercel auto-selects `public/` as the output directory when that folder exists. Set Output Directory to `.` explicitly, or the root files will 404.
 
 ---
 
@@ -58,14 +64,14 @@ Then open the URL printed by `serve` (usually `http://localhost:3000`).
 <iframe src="https://your-vercel-url.vercel.app" width="800" height="600" title="BloomCode ASCII Lily Studio"></iframe>
 ```
 
-The app detects its container with `ResizeObserver` and scales the font so the whole 80×40 grid stays visible. Preserve settings in the embed URL, for example:
+Preserve settings in the URL:
 
 ```html
-<iframe src="https://your-vercel-url.vercel.app/?speed=1&color=mono&bg=dark"
+<iframe src="https://your-vercel-url.vercel.app/?speed=1&color=color"
         width="800" height="600" title="BloomCode ASCII Lily Studio"></iframe>
 ```
 
-`X-Frame-Options: ALLOWALL` is set for embedding. Note that modern browsers ignore non-standard `X-Frame-Options` values, so the page is effectively embeddable because no restrictive value is sent.
+The Share button copies a permalink containing the current `speed` and `color` settings.
 
 ---
 
@@ -77,35 +83,40 @@ Drop any royalty-free MP3 at:
 public/audio/angel-radio-edit.mp3
 ```
 
-The bundled file is an **original, generated ambient loop** (16 s, 128 kbps, mono) so the local path works immediately with no external dependency. Replace it with your own track without changing any code — the player picks it up automatically.
+The bundled file is an **original generated ambient loop** (16 s, 128 kbps, mono), so the local path works immediately with no external dependency. Replacing it needs no code change.
 
-The load order is defined in `src/config.js`:
+Load order, defined in `src/config.js`:
 
 1. `/public/audio/angel-radio-edit.mp3`
-2. `CONFIG.AUDIO.CDN_URL` — a placeholder Pixabay URL; replace it with any CORS-enabled MP3
+2. `CONFIG.AUDIO.CDN_URL` — placeholder Pixabay URL; replace with any CORS-enabled MP3
 3. Generated `Tone.PolySynth` + reverb ambient melody
-4. Silent mode with a synthetic pulse (if Tone.js itself is blocked)
+4. Silent animation with a synthetic pulse if Tone.js itself is blocked
 
 ---
 
-## Customise colours
+## Customise colours and geometry
 
-Colours live in `src/config.js`:
+All geometry constants live in `src/config.js`.
 
 ```js
 export const PALETTE = Object.freeze({
-  red: '#FF4D4D',
+  red: '#FF2D55',
   purple: '#A855F7',
   yellow: '#FACC15',
   white: '#FFFFFF',
   green: '#22C55E',
   stem: '#22C55E',
-  leaf: '#16A34A',
-  accent: '#FDE68A',
+  leaf: '#22C55E',
+  accent: '#FACC15',
 });
 ```
 
-Monochrome green is `CONFIG.MONOCHROME_COLOR` (`#00ff41`). Flower positions, colours and bloom delays are in the `FLOWERS` array in the same file. The lily silhouette itself is the `LILY_SPRITE` array — edit its characters to reshape the petals, and `LEAF_SPRITE` to reshape the leaves. Rows are revealed from the centre outward, so the stamens open before the petal tips.
+- `FLOWERS` — fixed positions, colours, delays, scale and tilt
+- `PETALS` — the six petal angles and their `/ \ |` outline glyphs
+- `GLYPHS` — bud, pistil, pollen and stem characters
+- `CONFIG.MONOCHROME_COLOR` — `#00ff41` for the green terminal mode
+
+Petal bodies use only `/ \ | -` outlines with `@ # %` optional fill, never `*` or `.`.
 
 ---
 
@@ -131,9 +142,9 @@ BloomCode/
     └── config.js
 ```
 
-- `ascii-renderer.js` — 2D `{char, color}` framebuffer; batches same-colour runs into `<span>`s for one DOM write per frame
-- `flower-generator.js` — stems, leaves, buds, six-petal lilies, bouquet wrap and idle sway
-- `audio-sync.js` — Tone.js dynamic load, unlock, source failover, analyser and transport
+- `ascii-renderer.js` — 2D `{char, color}` framebuffer, batched into spans for one DOM write per frame
+- `flower-generator.js` — `generateStem` (solid), `generatePointedLily` (six petal vectors), `generateLeaf` (thin curve)
+- `audio-sync.js` — Tone.js load/unlock, source failover, analyser and transport
 - `main.js` — state, UI, URL params, keyboard, export/share, resize and the `requestAnimationFrame` loop
 
 ---
@@ -141,10 +152,9 @@ BloomCode/
 ## Accessibility & performance
 
 - `role="img"` and `aria-label="Animated ASCII lily bouquet"` on the artwork
-- Visible focus rings on every interactive control
-- Keyboard shortcuts for the main actions
-- 3,200 cells maximum; framebuffer cells are reused rather than reallocated
-- Pulsing uses CSS `transform` and `filter`, so audio reactivity does not re-render the grid
+- Visible focus rings on all controls
+- 3,200 cells maximum; framebuffer cells are reused instead of reallocated
+- Pulse is a CSS `transform`/`filter`, so audio reactivity costs no re-render
 - `prefers-reduced-motion` disables the transform pulse
 
 ---

@@ -12,25 +12,26 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
 
-  <!-- Tone.js 14.8.x is resolved through the import map. Version 14.8.49 is
-       the last published 14.8.x (14.8.59 does not exist on npm). main.js
-       imports it dynamically so a blocked CDN degrades to a silent animation. -->
+  <!-- Tone.js 14.8.59 via CDN import map, as specified. That exact patch was
+       never published to npm, so the UMD 14.8.49 build below is the working
+       primary source (Tone's ESM files also need a bundler). -->
   <script type="importmap">
   {
     "imports": {
-      "tone": "https://cdn.jsdelivr.net/npm/tone@14.8.49/build/esm/index.js"
+      "tone": "https://cdn.jsdelivr.net/npm/tone@14.8.59/build/esm/index.js"
     }
   }
   </script>
-
-  <!-- The UMD build is the primary path: Tone's ESM files use extensionless
-       relative imports that need a bundler. The import map remains as a
-       fallback, and a blocked CDN degrades to silent animation. -->
   <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
   <div class="app" id="app">
+    <header class="masthead">
+      <h1>Who needs flowers when you can code them? <span>- ASCII Lily Bouquet</span></h1>
+      <p class="subtitle">Vibecoding by Software Company - Summon Team</p>
+    </header>
+
     <main class="stage">
       <div class="frame-shell" id="frame-shell">
         <div class="pulse-layer" id="pulse-layer">
@@ -78,7 +79,7 @@
     </section>
 
     <footer class="footer">
-      <span>SPACE play/pause · R restart · M mute</span>
+      <span>SPACE play/pause • R restart • M mute |</span>
       <span id="status-line" class="status-line">Ready — press play to summon.</span>
     </footer>
   </div>

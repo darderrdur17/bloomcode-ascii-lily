@@ -4,7 +4,7 @@
  * @module main
  */
 
-import { CONFIG, FLOWERS } from './config.js';
+import { CONFIG } from './config.js';
 import { ASCIIRenderer } from './ascii-renderer.js';
 import { FlowerGenerator } from './flower-generator.js';
 import { AudioSync } from './audio-sync.js';
@@ -379,10 +379,8 @@ class BloomCodeApp {
    * @returns {void}
    */
   _updateTicker(progress) {
-    const top = Math.min(...FLOWERS.map((f) => f.y)) - 5;
-    const bottom = Math.max(...FLOWERS.map((f) => f.y)) + 5;
-    const ymin = Math.round(top - progress * 4);
-    const ymax = Math.round(bottom - progress * 3);
+    const ymin = -1;
+    const ymax = 24;
     const maxw = Math.round(20 + progress * 45);
     this.ticker.textContent =
       `ymin = ${ymin}, ymax = ${ymax}, maxw = ${maxw}; bloomProgress = ${progress.toFixed(2)};`;

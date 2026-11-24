@@ -419,7 +419,7 @@ body[data-theme='light'] .btn--hero { color: #fff; }
 }
 
 @media (max-height: 620px) {
-  .brand-line, .footer { display: none; }
+  .brand-line { display: none; }
   .app { gap: 6px; }
   h1 { font-size: 12px; }
   .subtitle { font-size: 9px; }
