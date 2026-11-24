@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Summon BloomCode — an interactive, music-synced ASCII lily bouquet built with vanilla JavaScript and Tone.js." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>Summon BloomCode — ASCII Lily Studio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+
+  <!-- Tone.js 14.8.x is resolved through the import map. Version 14.8.49 is
+       the last published 14.8.x (14.8.59 does not exist on npm). main.js
+       imports it dynamically so a blocked CDN degrades to a silent animation. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "tone": "https://cdn.jsdelivr.net/npm/tone@14.8.49/build/esm/index.js"
+    }
+  }
+  </script>
+
+  <!-- The UMD build is the primary path: Tone's ESM files use extensionless
+       relative imports that need a bundler. The import map remains as a
+       fallback, and a blocked CDN degrades to silent animation. -->
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="app" id="app">
+    <header class="masthead">
+      <div class="brand-line">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span class="brand-name">SUMMON BLOOMCODE</span>
+        <span class="brand-divider" aria-hidden="true">//</span>
+        <span class="brand-sub">ASCII LILY STUDIO</span>
+      </div>
+      <h1>Who needs flowers when you can code them? <span>— ASCII Lily Bouquet</span></h1>
+      <p class="subtitle">Vibecoding by Software Company — Summon Team | Qi (Director) | Gao (Architect) | Kou (Engineer) | Xu (PM) | Yan (QA)</p>
+    </header>
+
+    <main class="stage">
+      <div class="frame-shell" id="frame-shell">
+        <div class="pulse-layer" id="pulse-layer">
+          <pre id="canvas" role="img" aria-label="Animated ASCII lily bouquet"></pre>
+        </div>
+        <div class="scanlines" aria-hidden="true"></div>
+        <div class="frame-corner frame-corner--tl" aria-hidden="true"></div>
+        <div class="frame-corner frame-corner--tr" aria-hidden="true"></div>
+        <div class="frame-corner frame-corner--bl" aria-hidden="true"></div>
+        <div class="frame-corner frame-corner--br" aria-hidden="true"></div>
+      </div>
+
+      <div class="code-ticker" id="code-ticker" aria-live="off">ymin = 1e9, ymax = -1e9, maxw = 0; bloomProgress = 0.00;</div>
+    </main>
+
+    <section class="controls" aria-label="Animation controls">
+      <div class="control-group control-group--primary">
+        <button type="button" id="play-btn" class="btn btn--primary" aria-label="Play or pause animation">
+          <span class="btn-icon" id="play-icon" aria-hidden="true">▶</span>
+          <span id="play-label">Play</span>
+        </button>
+        <button type="button" id="restart-btn" class="btn" aria-label="Restart animation">↺ Restart</button>
+        <button type="button" id="mute-btn" class="btn" aria-label="Mute or unmute audio" aria-pressed="false">🔊 Sound</button>
+      </div>
+
+      <div class="control-group">
+        <label class="slider-field" for="speed">
+          <span>Speed</span>
+          <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1" aria-label="Playback speed" />
+          <output id="speed-value" for="speed">1.0×</output>
+        </label>
+        <label class="slider-field" for="volume">
+          <span>Volume</span>
+          <input type="range" id="volume" min="0" max="100" step="1" value="80" aria-label="Volume" />
+          <output id="volume-value" for="volume">80%</output>
+        </label>
+      </div>
+
+      <div class="control-group control-group--toggles">
+        <button type="button" id="color-btn" class="btn btn--toggle" aria-pressed="false">Color</button>
+        <button type="button" id="bg-btn" class="btn btn--toggle" aria-pressed="false">Dark</button>
+        <button type="button" id="export-btn" class="btn">⬇ .txt</button>
+        <button type="button" id="share-btn" class="btn">↗ Share</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>SPACE play/pause · R restart · M mute</span>
+      <span id="status-line" class="status-line">Ready — press play to summon.</span>
+    </footer>
+  </div>
+
+  <!-- Autoplay-policy gate: nothing audible happens until this is clicked. -->
+  <div class="start-overlay" id="start-overlay" role="dialog" aria-modal="true" aria-labelledby="start-title">
+    <div class="start-card">
+      <div class="start-glyph" aria-hidden="true">✳</div>
+      <h2 id="start-title">Summon the bouquet</h2>
+      <p class="start-sub">An ASCII lily garden that blooms in time with music.</p>
+      <button type="button" id="start-btn" class="btn btn--hero" aria-label="Play with music">
+        <span class="btn-icon" aria-hidden="true">▶</span> Play with Music
+      </button>
+      <div class="spinner" id="spinner" hidden aria-hidden="true"></div>
+      <p class="start-hint">Sound starts after your click · headphones recommended</p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
