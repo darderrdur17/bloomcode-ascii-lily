@@ -1,6 +1,6 @@
 # Summon BloomCode — ASCII Lily Studio
 
-An interactive ASCII lily bouquet that blooms in sync with music. Five pointed, six-petal lilies open from solid stems inside an 80×40 terminal grid, while an audio analyser drives a gentle brightness and scale pulse.
+An interactive ASCII lily bouquet that blooms in sync with music. The flower style is adapted from the reference bouquet in [`arimecoa/GIVEAWAY-ASCII`](https://github.com/arimecoa/GIVEAWAY-ASCII): volumetric six-petal lilies shaded with an ASCII density ramp, layered green foliage and drifting golden specks, rebuilt for an 80×40 `<pre>` grid. An audio analyser drives a gentle brightness and scale pulse.
 
 Built with **vanilla JavaScript ES6+**, HTML `<pre>` rendering and CSS3. No framework, no build step, no dependencies to install.
 
@@ -16,11 +16,11 @@ Designed for Qi (Delivery Director), Gao (Software Architect), Kou (Software Eng
 
 ## Features
 
-- Five **pointed star lilies**, each with six `/ \ |` petal lines and a yellow `(o)` pistil — no round blobs
-- Fixed bouquet layout: centre-top red, middle-left purple, middle-right yellow, bottom-left white, bottom-right red
-- **Solid stems** (`| / \`, one continuous glyph per row) converging cleanly at the base — no dashes, no ribbon artefact
-- **Thin leaves** (`(\/)` / `(/\)`), at most 4 cells wide and 2 tall, attached at a single point
-- Bloom stages: 0% stems → 20% bud `( )` → 40% two petals → 60% four petals → 100% six petals + `(o)`
+- Eight large **shaded lilies** plus five buds, each with six volumetric petals in pink, red, orange, yellow, coral or white
+- Density-ramp shading (`. : - = + * o O @`) gives the petals light, creases and curled tips like the reference
+- Layered green foliage: solid converging stems and narrow leaves with dark/mid/light shading
+- Drifting golden specks in the negative space and a CSS text glow
+- Staggered bloom: stems grow first, then each flower opens from a tight bud to a full six-petal lily
 - Audio unlock overlay, 120 BPM Tone.js Transport, RMS analyser pulse
 - Resilient audio chain: local MP3 → CDN MP3 → generated `Tone.PolySynth` ambient melody → silent animation
 - Controls: Pause/Play, Restart, Sound, Color, Dark, `.txt` Export, Share, Speed (0.5×–2×), Volume (0–100%)
@@ -111,12 +111,12 @@ export const PALETTE = Object.freeze({
 });
 ```
 
-- `FLOWERS` — fixed positions, colours, delays, scale and tilt
-- `PETALS` — the six petal angles and their `/ \ |` outline glyphs
-- `GLYPHS` — bud, pistil, pollen and stem characters
+- `SHADED_FLOWERS` — positions, sizes, palette, bloom delays and tilt for the eight open lilies
+- `SHADED_BUDS` — the five unopened buds
+- `SHADED_PALETTES` — deep/mid/tip colours and anther colour per variety
+- `DENSITY_RAMP` — the `. : - = + * o O @` characters used for petal shading
+- `FOLIAGE` — dark/mid/light/under green shades for stems and leaves
 - `CONFIG.MONOCHROME_COLOR` — `#00ff41` for the green terminal mode
-
-Petal bodies use only `/ \ | -` outlines with `@ # %` optional fill, never `*` or `.`.
 
 ---
 

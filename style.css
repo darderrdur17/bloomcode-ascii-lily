@@ -158,6 +158,7 @@ h1 span {
   user-select: text;
   text-align: left;
   color: var(--fg);
+  text-shadow: 0 0 5px currentColor;
 }
 
 .scanlines {
